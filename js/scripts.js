@@ -22,6 +22,7 @@
         this._name = pluginName;
         this.current = "";
         this.slideshow = false;
+        this.count = this.bigItem.length;
         this.initialHeight = 'auto';
         this.isFullScreen = false;
         this.$controls = $('.controls');
@@ -39,18 +40,35 @@
             var that = this,
                 smallItems = this.galleryContainer.find('ul:eq(0)'),
                 smallItem = smallItems.children('li'),
-                count = this.bigItem.length,
                 options = this.options;
                 
 
             this.setDelays(smallItems);
             this.bindListHandler(smallItems);
             this.handleQuit();
-            this.controlSlideShow(count);
+            this.controlSlideShow(this.count);
             if(options.fullScreenEnabled){
                 this.controlFullScreen();
             }
             this.changeHeight();
+            this.handleTouch();
+        },
+
+        handleTouch: function(){
+            var that = this;
+            //prevent image from being dragged without affecting its pointer events huhu!
+            this.bigItem.on('dragstart', function(event) { event.preventDefault(); });
+
+            var scrollLeftOnSwipe = Hammer(this.element).on("swipeleft", function(event) {
+                if(that.slideshow){
+                    that.controlLeftRight('next');
+                }
+            });
+            var scrollRightOnSwipe = Hammer(this.element).on("swiperight", function(event) {
+                if(that.slideshow){
+                    that.controlLeftRight('previous');
+                }
+            });
             
         },
 
@@ -177,22 +195,28 @@
                 
             });
 
+
             this.$control.on('click', function(){
-
                 var direction = $(this).data('direction');
-
-                (direction == 'next') ? that.current++ : that.current--;
-
-                if(that.current < 0) { 
-                    that.current = count - 1; 
-                }
-                else if(that.current == count) { 
-                    that.current = 0; 
-                }
-
-                that.moveToNextImage();
-
+                that.controlLeftRight(direction);
             });
+
+            
+        },
+
+        controlLeftRight: function(direction){
+                var direction = direction;
+
+                (direction == 'next') ? this.current++ : this.current--;
+
+                if(this.current < 0) { 
+                        this.current = this.count - 1; 
+                }
+                else if(this.current == this.count) { 
+                        this.current = 0; 
+                }
+
+                this.moveToNextImage();
         },
 
         moveToNextImage: function(){
