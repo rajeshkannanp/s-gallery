@@ -3,6 +3,8 @@
  *  Description: Responsive jQuery Gallery Plugin with CSS3 Animations inspired by http://store.sony.com/webapp/wcs/stores/servlet/ProductDisplay?catalogId=10551&storeId=10151&langId=-1&productId=8198552921666556433#gallery
  *  Author: Sara Soueidan
  *  License: Creative-Commons Attribution Non-Commercial
+
+ Customized: added number of image, for added captions in the HTML, these are hidden while image resizes
  */
 
 ;(function ( $, window, document, undefined ) {
@@ -131,6 +133,10 @@
                 that.showControls();
                 that.slideshow = true;
                 startImg = that.bigItemsList.children('li:eq(' + that.current + ')');
+                //to show index of img in list
+                var index = that.current + 1;
+                // startImg.find('.img-index').html(index + ' sur ' + that.count);
+
                 $this.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
                     startImg.addClass('fadeInScaleUp').removeClass('fadeOut');
                     that.bigItemsList.css('pointer-events', 'auto');
@@ -222,15 +228,20 @@
         moveToNextImage: function(){
             var that = this;
 
-            var currentImg = this.bigItemsList.children('li:eq(' + that.current + ')')
-                                         .addClass('fadeInScaleUp')
-                                         .siblings('li')
-                                         .filter('.fadeInScaleUp')
-                                         .removeClass('fadeInScaleUp')
-                                         .addClass('fadeOut')
-                                         .one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+            var currentImg = this.bigItemsList.children('li:eq(' + that.current + ')');
+            //add this to show index of img in list
+            var index = this.current + 1;
+            // currentImg.find('.img-index').html(index + ' sur ' + that.count);
+                              currentImg.addClass('fadeInScaleUp')
+                                        .siblings('li')
+                                        .filter('.fadeInScaleUp')
+                                        .removeClass('fadeInScaleUp')
+                                        .addClass('fadeOut')
+                                        .one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
                                             $(this).removeClass('fadeOut');
-                                         });
+                                        });
+
+            
             this.changeHeight(600);
         },
 
@@ -286,10 +297,11 @@
                     $(this).css('height', 'auto');
                 });
             }
+
             this.bigItemsList.css('pointer-events', 'none');
             var currentImg = this.galleryContainer.children('ul:eq(1)').children('li:eq(' + that.current + ')'),
                   dropZone = this.galleryContainer.children('ul:eq(0)').children('li:eq(' + that.current + ')'),
-                    height = dropZone.height(),
+                    height = dropZone.height() - dropZone.find('.item-price').height(),
                      width = dropZone.width(),
                       left = dropZone.position().left,
                        top = dropZone.position().top,
@@ -297,6 +309,8 @@
                   duration = parseFloat(dropZone.css('animation-duration')),
                       wait = delay + duration;
 
+            //hide image description while it is resizing
+            currentImg.find('.img-caption').css('opacity', '0');
             currentImg.children('img').andSelf().animate({
                 'height'     : height,
                 'width'      : width ,
@@ -304,6 +318,7 @@
                 'top'        : top  + 'px',
             }, wait * 1000, function(){
                     $(this).removeClass('fadeInScaleUp').removeAttr('style');
+                    currentImg.find('.img-caption').css('opacity', '1');
             });
         }
     };
