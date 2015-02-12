@@ -271,7 +271,7 @@
                     screenfull.toggle(gallery);
                     if(!that.isFullScreen){
                         $(this).removeClass('icon-fullscreen').addClass('icon-fullscreen-exit');
-                        that.isFullScreenfull = true;
+                        that.isFullScreen = true;
                     }
                     else{
                         $(this).removeClass('icon-fullscreen-exit').addClass('icon-fullscreen');
